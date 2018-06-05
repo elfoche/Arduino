@@ -1,0 +1,218 @@
+#include "DHT12.h"
+#include <ESP8266WiFi.h>
+#include <ESP8266HTTPClient.h>
+#include <Losant.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+
+
+//#define DHTPIN 14     // what digital pin the DHT22 is conected to
+//#define DHTTYPE DHT12   // There are multiple kinds of DHT sensors
+//DHT12 dht12(DHTPIN, DHTTYPE);
+
+#define DHTTYPE DHT12   // DHT 12
+DHT12 dht12 (D5, true);
+
+// WiFi credentials.
+const char* WIFI_SSID = "Red&Server";
+const char* WIFI_PASS = "Red@UADER";
+
+// Losant credentials.
+const char* LOSANT_DEVICE_ID = "5b15c75996c2ca000681d31f";
+const char* LOSANT_ACCESS_KEY = "8fe96ba9-87da-4ff5-875a-335dd829874c";
+const char* LOSANT_ACCESS_SECRET = "5f1cf6faad645b8d7793c76894ad74934bbd16e9f4a8f8efdb2fefd7477733b3";
+
+
+WiFiClientSecure wifiClient;
+
+LosantDevice device(LOSANT_DEVICE_ID);
+
+void connect() {
+
+  // Connect to Wifi.
+  Serial.println();
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(WIFI_SSID);
+
+  // WiFi fix: https://github.com/esp8266/Arduino/issues/2186
+  WiFi.persistent(false);
+  WiFi.mode(WIFI_OFF);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+  unsigned long wifiConnectStart = millis();
+
+  while (WiFi.status() != WL_CONNECTED) {
+    // Check to see if
+    if (WiFi.status() == WL_CONNECT_FAILED) {
+      Serial.println("Failed to connect to WIFI. Please verify credentials: ");
+      Serial.println();
+      Serial.print("SSID: ");
+      Serial.println(WIFI_SSID);
+      Serial.print("Password: ");
+      Serial.println(WIFI_PASS);
+      Serial.println();
+    }
+
+    delay(500);
+    Serial.println("...");
+    // Only try for 5 seconds.
+    if(millis() - wifiConnectStart > 5000) {
+      Serial.println("Failed to connect to WiFi");
+      Serial.println("Please attempt to send updated configuration parameters.");
+      return;
+    }
+  }
+
+  Serial.println();
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+  Serial.println();
+
+  Serial.print("Authenticating Device...");
+  HTTPClient http;
+  http.begin("http://api.losant.com/auth/device");
+  http.addHeader("Content-Type", "application/json");
+  http.addHeader("Accept", "application/json");
+
+  /* Create JSON payload to sent to Losant
+   *
+   *   {
+   *     "deviceId": "575ecf887ae143cd83dc4aa2",
+   *     "key": "this_would_be_the_key",
+   *     "secret": "this_would_be_the_secret"
+   *   }
+   *
+   */
+
+  StaticJsonBuffer<200> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["deviceId"] = LOSANT_DEVICE_ID;
+  root["key"] = LOSANT_ACCESS_KEY;
+  root["secret"] = LOSANT_ACCESS_SECRET;
+  String buffer;
+  root.printTo(buffer);
+
+  int httpCode = http.POST(buffer);
+
+  if(httpCode > 0) {
+      if(httpCode == HTTP_CODE_OK) {
+          Serial.println("This device is authorized!");
+      } else {
+        Serial.println("Failed to authorize device to Losant.");
+        if(httpCode == 400) {
+          Serial.println("Validation error: The device ID, access key, or access secret is not in the proper format.");
+        } else if(httpCode == 401) {
+          Serial.println("Invalid credentials to Losant: Please double-check the device ID, access key, and access secret.");
+        } else {
+           Serial.println("Unknown response from API");
+        }
+      }
+    } else {
+        Serial.println("Failed to connect to Losant API.");
+
+   }
+
+  http.end();
+
+  // Connect to Losant.
+  Serial.println();
+  Serial.print("Connecting to Losant...");
+
+  device.connectSecure(wifiClient, LOSANT_ACCESS_KEY, LOSANT_ACCESS_SECRET);
+
+  while(!device.connected()) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("Connected!");
+  Serial.println();
+  Serial.println("This device is now ready for use!");
+}
+
+void setup() {
+  Serial.begin(9600);
+  Serial.setTimeout(2000);
+
+  // Wait for serial to initialize.
+  while(!Serial) { }
+
+  Serial.println("Device Started");
+  Serial.println("-------------------------------------");
+  Serial.println("Running DHT12!");
+  Serial.println("-------------------------------------");
+
+  connect();
+}
+
+void report(double h12, double t12, double hic12) {
+  StaticJsonBuffer<500> jsonBuffer;
+  JsonObject& root = jsonBuffer.createObject();
+  root["h12"] = h12;
+  root["t12"] = t12;
+  root["hic12"] = hic12;
+  device.sendState(root);
+  Serial.println("Reported!");
+}
+
+int timeSinceLastRead = 0;
+
+void loop() {
+   bool toReconnect = false;
+
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("Disconnected from WiFi");
+    toReconnect = true;
+  }
+
+  if (!device.connected()) {
+    Serial.println("Disconnected from MQTT");
+    Serial.println(device.mqttClient.state());
+    toReconnect = true;
+  }
+
+  if (toReconnect) {
+    connect();
+  }
+
+  device.loop();
+
+  // Report every 2 seconds.
+  if(timeSinceLastRead > 2000) {
+    // Reading temperature or humidity takes about 250 milliseconds!
+    // Sensor readings may also be up to 2 seconds 'old' (its a very slow sensor)
+    float h12 = dht12.readHumidity();
+    // Read temperature as Celsius (the default)
+    float t12 = dht12.readTemperature();
+
+    // Check if any reads failed and exit early (to try again).
+    if (isnan(h12) || isnan(t12)) {
+      Serial.println("Failed to read from DHT sensor!");
+      timeSinceLastRead = 0;
+      return;
+    }
+
+    // Compute heat index in Fahrenheit (the default)
+    //float hic12 = dht12.computeHeatIndex(hic12);
+    // Compute heat index in Celsius (isFahreheit = false)
+    float hic12 = dht12.computeHeatIndex(t12, h12, false);
+
+    Serial.print("Humidity: ");
+    Serial.print(h12);
+    Serial.print(" %\t");
+    Serial.print("Temperature: ");
+    Serial.print(t12);
+    Serial.print(" *C ");
+    Serial.print("Heat index: ");
+    Serial.print(hic12);
+    Serial.print(" *C ");
+    report(h12, t12, hic12);
+
+    timeSinceLastRead = 0;
+  }
+  delay(100);
+  timeSinceLastRead += 100;
+}
