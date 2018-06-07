@@ -14,8 +14,8 @@
 DHT12 dht12 (D5, true);
 
 // WiFi credentials.
-const char* WIFI_SSID = "Red&Server";
-const char* WIFI_PASS = "Red@UADER";
+const char* WIFI_SSID = "*******";
+const char* WIFI_PASS = "*******";
 
 // Losant credentials.
 const char* LOSANT_DEVICE_ID = "5b15c75996c2ca000681d31f";
