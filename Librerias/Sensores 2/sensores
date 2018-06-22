@@ -1,0 +1,155 @@
+HC-SR04 Arduino Ultrasonic Module
+
+    Working Voltage : DC 5V.
+    Static current: Less than 2mA.
+    Output Level: more than 5V
+    Input levels: less than 0V
+    Sensor angle: Not more than 15 degrees.
+    Detection distance: 2cm-450cm.
+    High precision: better than 2mm.
+    Mode of connection: VCC, trig(T), echo(R), GND
+
+    Power Supply :+5V DC
+    Quiescent Current : <2mA
+    Working Current: 15mA
+    Effectual Angle: <15°
+    Ranging Distance : 2cm – 400 cm/1″ – 13ft
+    Resolution : 0.3 cm
+    Measuring Angle: 30 degree
+    Trigger Input Pulse width: 10uS
+    Dimension: 45mm x 20mm x 15mm
+
+Sensor de Humedad y Temperatura DHT11
+
+    Tensión de operación: 3 a 5 VDC @2.5mA max.
+    Rango de medición de humedad: 20-80% @±5% de exactitud.
+    Rango de medición de temperatura: 0-50ºC @±2% de exactitud.﻿
+    Máxima velocidad de muestreo: 1Hz.
+    Tamaño: 15.5x12x5.5 mm.
+    4 pines con paso 0.1".
+
+Sensor de Humedad y Temperatura DHT22
+
+    Tensión de operación: 3.3 a 6 VDC @1.5mA max. (50uA en stand-by)
+    Rango de medición de humedad: 0-100% @±2% (max ±5%) de exactitud.
+    Rango de medición de temperatura: -40 a +125ºC ±0.2 ºC de exactitud.﻿
+
+Mini Photocell LDR
+
+    Light resistance : ~1k Ohm
+    Dark resistance : ~10k Ohm
+    Max voltage : 150V
+    Max power: 100mW
+
+PIR Motion Sensor Module
+
+    Input Voltage: DC 4.5-20V
+    Static current: 50uA
+    Output signal: 3,3V or 5V (Output high when motion detected)
+    Sentry Angle: 110 degree
+    Sentry Distance: max 7 m
+    Shunt for setting overide trigger: H - Yes, L - No
+
+BMP180 Barometric Pressure/Temperature /Altitude Sensor
+
+
+    Vin: 3 to 5VDC
+    Logic: 3 to 5V compliant
+    Pressure sensing range: 300-1100 hPa (9000m to -500m above sea level)
+    Up to 0.03hPa / 0.25m resolution
+    -40 to +85°C operational range, +-2°C temperature accuracy
+    This board/chip uses I2C 7-bit address 0x77.
+
+
+Flame Sensor Module
+
+    Can detect flame or wavelength of light source within 760nm~1100nm
+    Lighter flame detect distance 80cm
+    Greater the flame, farther the test distance
+    Detect angle: 60 degree, very sensitive with flame spectrum
+    The sensitivity is adjustable (the blue digital potentiometer)
+    Comparator output
+    Working voltage: 3.3-5V
+    Output: digital switch outputs (0 and 1)
+    With fixed bolt hole for easy installation
+    With stable LM393 chipset in comparator
+
+
+
+IR Infrared Obstacle Detaction Sensor Module 2 - 30cm FC-51
+
+    There is an obstacle, the green indicator light on the circuit board
+    Digital output signal
+    Detection distance: 2 ~ 30cm
+    Detection angle: 35 ° Degree
+    Comparator chip: LM393
+    Adjustable detection distance range via potentiometer:
+        Clockwise: Increase detection distance
+        Counter-clockwise: Reduce detection distance
+
+temt6000
+
+LDR
+
+ReedSwitch
+
+Thermistor 100h
+
+Módulo sensor de gases inflamables y humo MQ-2
+
+Input voltage: DC5V
+Power consumption (current): 150mA
+DO output: TTL digital 0 and 1 (0.1 and 5V)
+AO output: 0.1 - 0.3V (relative to pollution), the maximum concentration of a voltage of about 4V
+Special note: after the sensor is powered , needs to warm up around 20S, measured data was stable , heat sensor is a normal phenomenon , because the internal heating wire , if hot is not normal 
+
+UV Sensor ML8511
+
+
+Módulo GPS Ublox NEO-6M
+
+    Modulo GPS Ublox NEO-6M
+    Comunicación serial
+    Voltaje de alimentación:  (3.5 – 5 )VDC
+    Antena cerámica activa incluida
+    LED indicador de señal
+    Tamaño de antena 22x22mm
+    Tamaño de modulo 23x30mm
+    BAUDRATE: 9600
+    EEPROM para guadar configuración de parámetros
+    Sistema de coordenadas: WGS-84
+    Sensibilidad de captura -148dBm
+    Sensibilidad de rastreo: -161 dBm
+    Máxima altura medible: 18000
+    Máxima velocidad 515 m/s
+    Exactitud: 1micro segundo
+    Frecuencia receptora: L1 (1575.42 Mhz)
+    Código C/A 1.023 Mhz
+    Tiempo de inicio primera vez: 38s en promedio
+    Tiempo de inicio : 35s en promedio
+
+YL-69 Soil Hygrometer Humidity Detection
+
+Módulo sensor de lluvia
+
+Electronic Bricks - Water Sensor
+
+Magnetómetro HMC5883L
+
+    Simple I2C interface
+    2.16-3.6VDC supply range
+    Low current draw
+    5 milli-gauss resolution
+http://www.magnetic-declination.com/
+declinacion concepcion del uruguay -10° 13' 
+
+
+Detector de Rayos
+ Detecta descargas de nube a tierra (rayos) y entre nubes (relámpagos).
+Bobina detectora con núcleo de ferrite incorporada en la misma placa.
+Estima la distancia a la que se produjeron las descargas, entre 1km y 40km, en 14 pasos.
+Umbral de detección configurable.
+Interfaz: configurable SPI o I2C (dirección de esclavo I2C: 00).
+Circuito LC sintonizable por software, mediante comandos enviados desde el microcontrolador o Arduino.
+Con cada placa, se suministra el valor de calibración del capacitor de sintonía interno, para configurar en el software de la aplicación.
+Alimentación: entre 2.4V y 5.5V.
