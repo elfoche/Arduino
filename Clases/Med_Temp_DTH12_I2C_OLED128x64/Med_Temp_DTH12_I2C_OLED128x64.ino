@@ -8,6 +8,10 @@
 
 #include <DHT12.h>
 
+#define R 6
+#define G 7
+#define B 8
+
 
 //Displa OLED 0.96" 128x64, Direccion I2C 0x3C
 #define OLED_RESET 0
@@ -29,6 +33,15 @@ void setup(){
   // Clear the buffer.
   display.clearDisplay();
 
+  //poniendo en marcla los led
+  pinMode(R, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(B, OUTPUT);
+
+  digitalWrite(R,HIGH);
+  digitalWrite(G,HIGH);
+  digitalWrite(B,HIGH);
+
 }
  
 void loop(){
@@ -48,9 +61,8 @@ void loop(){
       display.display();
       delay(2000);
       display.clearDisplay();
-      
 
-    }
+      }
   
   
     if (dht12Read){
@@ -58,7 +70,8 @@ void loop(){
       float hic12 = dht12.computeHeatIndex(t12, h12, false);
       // Compute dew point in Celsius (isFahreheit = false)
       float dpc12 = dht12.dewPoint(t12, h12, false);  
-  /*    
+      
+  /*  comentado porque desborda la memoria si corre junto al serial
       Serial.print("Humedad: ");
       Serial.print(h12);
       Serial.println(" %\t");
@@ -73,11 +86,24 @@ void loop(){
       Serial.println(" *C");
       Serial.println("###------------###");  
 */
-      // muestra una línea de texto
+      //Salida al LED SI SUPERA
+      if (t12>=2200) {
+        digitalWrite(R,LOW);
+      }
+
+      //Salida al LED SI es normal 
+      if (t12=21.00) {
+        digitalWrite(G,LOW);
+      }
+
+      //Salida al LED SI BAJA
+      if (t12<=20.00) {
+        digitalWrite(B,LOW);
+      }
+      
+      //Salida al display
       display.setTextSize(2);
       display.setTextColor(WHITE);
-     // display.startscrolldiagleft(1000,0);
-      
       display.setCursor(0,0);
       display.println("Temperatu");
       display.print("ra:");
